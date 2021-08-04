@@ -793,18 +793,6 @@ animate({
 			Element.prototype.msMatchesSelector;
 	}
 })();
-const headerElement = document.querySelector(".header");
-
-const addHeaderBgClass = function (entries, observer) {
-  if (entries[0].isIntersecting) {
-    headerElement.classList.remove("_scroll");
-  } else {
-    headerElement.classList.add("_scroll");
-  }
-};
-const headerObserver = new IntersectionObserver(addHeaderBgClass);
-headerObserver.observe(headerElement);
-
 //let btn = document.querySelectorAll('button[type="submit"],input[type="submit"]');
 let forms = document.querySelectorAll("form");
 if (forms.length > 0) {
@@ -1794,6 +1782,68 @@ function scroll_animate(event) {
   }
   //If native scroll
   //disableScroll();
+}
+
+const headerElement = document.querySelector(".header");
+
+const addHeaderBgClass = function (entries, observer) {
+  if (entries[0].isIntersecting) {
+    headerElement.classList.remove("_scroll");
+  } else {
+    headerElement.classList.add("_scroll");
+  }
+};
+const headerObserver = new IntersectionObserver(addHeaderBgClass);
+headerObserver.observe(headerElement);
+// ===============
+// changing file form input label and image. Size validation
+
+const file = document.querySelector(".file");
+const fileInput = document.querySelector(".file__input");
+const fileLabel = document.querySelector(".file__label");
+const fileLabelText = document.querySelector(".file__text");
+const fileUploadImage = document.querySelector(".file__upload");
+const fileLoadingAnimationImage = document.querySelector(".file__loading");
+const filePaperclipImage = document.querySelector(".file__paperclip");
+
+const FILE_LIMIT = 5242880;
+
+const convertFileSize = (kbytes) => {
+  if (kbytes > 1048576) {
+    return `${(kbytes / 1048576).toFixed(2)} Mb`;
+  } else {
+    return `${(kbytes / 1024) | 0} Kb`;
+  }
+};
+
+if (fileInput) {
+  fileInput.addEventListener("change", () => {
+    const fileName = fileInput.files[0].name.split(".").slice(0, -1).join(" ");
+    const fileSize = fileInput.files[0].size;
+    const fileExt = fileInput.files[0].name.split(".").pop().toUpperCase();
+
+    if (fileSize > FILE_LIMIT) {
+      fileLabelText.innerText = fileInput.getAttribute("data-error");
+      fileLabel.classList.add("file__label_overflow");
+      fileUploadImage.style.display = "block";
+      filePaperclipImage.style.display = "none";
+    } else {
+      fileLabel.classList.remove("file__label_overflow");
+      fileInput.classList.remove("_focus");
+      file.classList.remove("_focus");
+      fileLabel.blur();
+
+      fileUploadImage.style.display = "none";
+      filePaperclipImage.style.display = "block";
+
+      fileLabel.style.fontSize = 14 + "px";
+      fileLabelText.innerHTML = `${fileName} (${fileExt}, 
+        ${convertFileSize(fileSize)}
+      )`;
+
+      file.classList.add("_attached");
+    }
+  });
 }
 
 
