@@ -1,3 +1,182 @@
+// Dynamic Adapt v.1
+// HTML data-da="where(uniq class name),when(breakpoint),position(digi)"
+// e.x. data-da=".item,992,2"
+// Andrikanych Yevhen 2020
+// https://www.youtube.com/c/freelancerlifestyle
+
+"use strict";
+
+function DynamicAdapt(type) {
+  this.type = type;
+}
+
+DynamicAdapt.prototype.init = function () {
+  const _this = this;
+  // массив объектов
+  this.оbjects = [];
+  this.daClassname = "_dynamic_adapt_";
+  // массив DOM-элементов
+  this.nodes = document.querySelectorAll("[data-da]");
+
+  // наполнение оbjects объктами
+  for (let i = 0; i < this.nodes.length; i++) {
+    const node = this.nodes[i];
+    const data = node.dataset.da.trim();
+    const dataArray = data.split(",");
+    const оbject = {};
+    оbject.element = node;
+    оbject.parent = node.parentNode;
+    оbject.destination = document.querySelector(dataArray[0].trim());
+    оbject.breakpoint = dataArray[1] ? dataArray[1].trim() : "767";
+    оbject.place = dataArray[2] ? dataArray[2].trim() : "last";
+    оbject.index = this.indexInParent(оbject.parent, оbject.element);
+    this.оbjects.push(оbject);
+  }
+
+  this.arraySort(this.оbjects);
+
+  // массив уникальных медиа-запросов
+  this.mediaQueries = Array.prototype.map.call(
+    this.оbjects,
+    function (item) {
+      return (
+        "(" +
+        this.type +
+        "-width: " +
+        item.breakpoint +
+        "px)," +
+        item.breakpoint
+      );
+    },
+    this
+  );
+  this.mediaQueries = Array.prototype.filter.call(
+    this.mediaQueries,
+    function (item, index, self) {
+      return Array.prototype.indexOf.call(self, item) === index;
+    }
+  );
+
+  // навешивание слушателя на медиа-запрос
+  // и вызов обработчика при первом запуске
+  for (let i = 0; i < this.mediaQueries.length; i++) {
+    const media = this.mediaQueries[i];
+    const mediaSplit = String.prototype.split.call(media, ",");
+    const matchMedia = window.matchMedia(mediaSplit[0]);
+    const mediaBreakpoint = mediaSplit[1];
+
+    // массив объектов с подходящим брейкпоинтом
+    const оbjectsFilter = Array.prototype.filter.call(
+      this.оbjects,
+      function (item) {
+        return item.breakpoint === mediaBreakpoint;
+      }
+    );
+    matchMedia.addListener(function () {
+      _this.mediaHandler(matchMedia, оbjectsFilter);
+    });
+    this.mediaHandler(matchMedia, оbjectsFilter);
+  }
+};
+
+DynamicAdapt.prototype.mediaHandler = function (matchMedia, оbjects) {
+  if (matchMedia.matches) {
+    for (let i = 0; i < оbjects.length; i++) {
+      const оbject = оbjects[i];
+      оbject.index = this.indexInParent(оbject.parent, оbject.element);
+      this.moveTo(оbject.place, оbject.element, оbject.destination);
+    }
+  } else {
+    for (let i = 0; i < оbjects.length; i++) {
+      const оbject = оbjects[i];
+      if (оbject.element.classList.contains(this.daClassname)) {
+        this.moveBack(оbject.parent, оbject.element, оbject.index);
+      }
+    }
+  }
+};
+
+// Функция перемещения
+DynamicAdapt.prototype.moveTo = function (place, element, destination) {
+  element.classList.add(this.daClassname);
+  if (place === "last" || place >= destination.children.length) {
+    destination.insertAdjacentElement("beforeend", element);
+    return;
+  }
+  if (place === "first") {
+    destination.insertAdjacentElement("afterbegin", element);
+    return;
+  }
+  destination.children[place].insertAdjacentElement("beforebegin", element);
+};
+
+// Функция возврата
+DynamicAdapt.prototype.moveBack = function (parent, element, index) {
+  element.classList.remove(this.daClassname);
+  if (parent.children[index] !== undefined) {
+    parent.children[index].insertAdjacentElement("beforebegin", element);
+  } else {
+    parent.insertAdjacentElement("beforeend", element);
+  }
+};
+
+// Функция получения индекса внутри родителя
+DynamicAdapt.prototype.indexInParent = function (parent, element) {
+  const array = Array.prototype.slice.call(parent.children);
+  return Array.prototype.indexOf.call(array, element);
+};
+
+// Функция сортировки массива по breakpoint и place
+// по возрастанию для this.type = min
+// по убыванию для this.type = max
+DynamicAdapt.prototype.arraySort = function (arr) {
+  if (this.type === "min") {
+    Array.prototype.sort.call(arr, function (a, b) {
+      if (a.breakpoint === b.breakpoint) {
+        if (a.place === b.place) {
+          return 0;
+        }
+
+        if (a.place === "first" || b.place === "last") {
+          return -1;
+        }
+
+        if (a.place === "last" || b.place === "first") {
+          return 1;
+        }
+
+        return a.place - b.place;
+      }
+
+      return a.breakpoint - b.breakpoint;
+    });
+  } else {
+    Array.prototype.sort.call(arr, function (a, b) {
+      if (a.breakpoint === b.breakpoint) {
+        if (a.place === b.place) {
+          return 0;
+        }
+
+        if (a.place === "first" || b.place === "last") {
+          return 1;
+        }
+
+        if (a.place === "last" || b.place === "first") {
+          return -1;
+        }
+
+        return b.place - a.place;
+      }
+
+      return b.breakpoint - a.breakpoint;
+    });
+    return;
+  }
+};
+
+const da = new DynamicAdapt("max");
+da.init();
+
 function email_test(input) {
 	return !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,8})+$/.test(input.value);
 }
@@ -869,6 +1048,21 @@ if (forms.length > 0) {
     el.addEventListener("submit", form_submit);
   }
 }
+
+function removePlaceholderErrOnClick() {
+  let errors = document.querySelectorAll(".form__error");
+  if (errors.length > 0) {
+    for (let index = 0; index < errors.length; index++) {
+      const err = errors[index];
+      err.addEventListener("click", () => {
+        const errInput = err.parentNode.children[0];
+        errInput.focus();
+      });
+      //
+    }
+  }
+}
+
 async function form_submit(e) {
   let btn = e.target;
   let form = btn.closest("form");
@@ -910,9 +1104,12 @@ async function form_submit(e) {
     }
   } else {
     let form_error = form.querySelectorAll("._error");
+
     if (form_error && form.classList.contains("_goto-error")) {
       _goto(form_error[0], 1000, 50);
     }
+
+    removePlaceholderErrOnClick();
     e.preventDefault();
   }
 }
@@ -940,6 +1137,7 @@ function form_validate_input(input) {
     }
     if (email_test(input) || input.value == input_g_value) {
       form_add_error(input);
+      input.placeholder = "";
       error++;
     } else {
       form_remove_error(input);
@@ -950,6 +1148,7 @@ function form_validate_input(input) {
   } else {
     if (input.value == "" || input.value == input_g_value) {
       form_add_error(input);
+      input.placeholder = "";
       error++;
     } else {
       form_remove_error(input);
@@ -1870,32 +2069,78 @@ const file = document.querySelector(".file");
 const fileInput = document.querySelector(".file__input");
 const fileLabel = document.querySelector(".file__label");
 const fileLabelText = document.querySelector(".file__text");
-const fileExt = document.querySelector(".file__ext");
+const fileLabelName = document.querySelector(".file__name");
+const fileExtText = document.querySelector(".file__ext");
 const fileUploadImage = document.querySelector(".file__upload");
 const fileLoadingAnimationImage = document.querySelector(".file__loading");
 const filePaperclipImage = document.querySelector(".file__paperclip");
+const fileUnpinIcon = document.querySelector(".file__unpin");
+const formMaxSizeTip = document.querySelector(".form__maxsize");
 
 const FILE_LIMIT = 5242880;
 
 const convertFileSize = (kbytes) => {
   if (kbytes > 1048576) {
     return `${(kbytes / 1048576).toFixed(2)} Mb`;
-  } else {
+  } else if (kbytes < 1048576 && kbytes >= 1024) {
     return `${(kbytes / 1024) | 0} Kb`;
+  } else if (kbytes < 1024) {
+    return `${kbytes | 0} Bytes`;
   }
 };
 
+function handleFileSelect(f) {
+  var reader = new FileReader();
+
+  // Closure to capture the file information.
+  reader.onloadstart = (function () {
+    return function () {
+      console.log(`load ${f.name} start`);
+    };
+  })(f);
+  reader.onloadend = (function () {
+    return function () {
+      console.log(`load ${f.name} end`);
+    };
+  })(f);
+
+  reader.readAsDataURL(f);
+}
+
+let isFileAttached = false;
+
 if (fileInput) {
+  fileInput.addEventListener("click", (e) => {
+    if (!isFileAttached) {
+      return;
+    } else if (isFileAttached) {
+      e.stopPropagation();
+      e.preventDefault();
+      e.target.value = "";
+      isFileAttached = false;
+      fileUploadImage.style.display = "block";
+      filePaperclipImage.style.display = "none";
+      fileUnpinIcon.style.display = "none";
+      fileExtText.style.display = "none";
+      fileLabelText.innerText = "Upload file";
+    }
+  });
   fileInput.addEventListener("change", () => {
     const fileName = fileInput.files[0].name.split(".").slice(0, -1).join(" ");
     const fileSize = fileInput.files[0].size;
     const fileExt = fileInput.files[0].name.split(".").pop().toUpperCase();
 
+    if (isFileAttached) {
+    }
     if (fileSize > FILE_LIMIT) {
+      // handleFileSelect(fileInput.files[0]);
       fileLabelText.innerText = fileInput.getAttribute("data-error");
+      fileLabelText.style.maxWidth = "265px";
       fileLabel.classList.add("file__label_overflow");
       fileUploadImage.style.display = "block";
       filePaperclipImage.style.display = "none";
+      fileUnpinIcon.style.display = "none";
+      fileExtText.style.display = "none";
     } else {
       fileLabel.classList.remove("file__label_overflow");
       fileInput.classList.remove("_focus");
@@ -1906,11 +2151,20 @@ if (fileInput) {
       filePaperclipImage.style.display = "block";
 
       fileLabel.style.fontSize = 14 + "px";
-      fileLabelText.innerHTML = `${fileName} (${fileExt}, 
-        ${convertFileSize(fileSize)}
-      )`;
 
       file.classList.add("_attached");
+
+      if (fileInput.files.length != 0) {
+        isFileAttached = true;
+        fileUnpinIcon.style.display = "block";
+        filePaperclipImage.style.display = "none";
+        formMaxSizeTip.style.display = "none";
+        fileLabelText.innerHTML = `${fileName}`;
+        fileExtText.style.display = "block";
+        fileExtText.innerHTML = ` (${fileExt}, ${convertFileSize(fileSize)})`;
+      } else {
+        isFileAttached = false;
+      }
     }
   });
 }
@@ -1952,7 +2206,7 @@ hexagons.forEach((hex) => {
 // Show more button ======================================
 
 function addUnderLine(items, itemsToUnderline, isEven) {
-  linesAmount = window.innerWidth <= 768 ? itemsToUnderline - 1 : isEven ? itemsToUnderline - 2 : itemsToUnderline - 1;
+  const linesAmount = window.innerWidth <= 768 ? itemsToUnderline - 1 : isEven ? itemsToUnderline - 2 : itemsToUnderline - 1;
 
   for (let i = 0; i < linesAmount; i++) {
     items[i].style.cssText = "border-bottom: 1px solid #fff";
@@ -1996,39 +2250,52 @@ if (vacancies.length > 0) {
   });
 }
 
-// Side slide text animation ==============
-// const slideAnimationItems = document.querySelectorAll(".menu__link");
+// Side slide text animation (from left to right)==============
 
-// const setDefaultGradient = (color) => {
-//   slideAnimationItems.forEach((item) => {
-//     item.style.cssText = `
-//     background: linear-gradient(to right, ${color} 0%, ${color} 33.33%, #1d4bef 33.33%, #1d4bef 66.66%, ${color} 66.66%, ${color} 100%);
-//     background-clip: text;
-//     -webkit-background-clip: text;
-//     -webkit-text-fill-color: transparent;
-//     background-size: 300% 100%;
-//     background-position: 300%;
-//     `;
-//   });
-// };
+const textList = document.querySelectorAll(".vacancies__item");
 
-// if (slideAnimationItems.length > 0) {
-//   slideAnimationItems.forEach((item) => {
-//     // item.addEventListener("mouseover", (e) => {
-//     //   let hoveredItem = e.target;
-//     //   hoveredItem.style.cssText = "background-position:200%;";
-//     // });
-//     item.addEventListener("mouseout", (e) => {
-//       let unhoveredItem = e.target;
-//       unhoveredItem.style.cssText = "background-position:100%;";
-//       setTimeout(() => {
-//         unhoveredItem.style.cssText = `-webkit-text-fill-color: ${e.target.style.color}`;
-//       }, 100);
-//       setTimeout(() => {
-//         setDefaultGradient(e.target);
-//       }, 500);
-//     });
-//   });
-// }
+if (textList.length > 0 && window.innerWidth >= 768) {
+  textList.forEach((text) => {
+    text.addEventListener("mouseover", () => {
+      text.style.cssText = "background-position: 0 100%;border-bottom: 1px solid #fff";
+    });
+    text.addEventListener("mouseleave", () => {
+      text.style.cssText = "background-position: -100%;border-bottom: 1px solid #fff";
+      setTimeout(() => {
+        text.style.cssText = `
+            text-fill-color: white;
+            -webkit-text-fill-color: white;
+            border-bottom: 1px solid #fff
+          `;
+      }, 300);
+    });
+  });
+}
+
+const headerLinks = document.querySelectorAll(".menu__link");
+
+if (headerLinks.length > 0) {
+  headerLinks.forEach((text) => {
+    const headerLinkColor = text.getAttribute("data-color");
+    text.addEventListener("mouseover", () => {
+      text.style.cssText = "background-position: 0 100%;";
+    });
+    text.addEventListener("mouseleave", () => {
+      text.style.cssText = "background-position: -100%;";
+      setTimeout(() => {
+        text.style.cssText = `
+            text-fill-color: ${headerLinkColor};
+            -webkit-text-fill-color: ${headerLinkColor};
+          `;
+      }, 300);
+      setTimeout(() => {
+        text.style.cssText = `
+            text-fill-color: transparent;
+            -webkit-text-fill-color: transparent;
+          `;
+      }, 620);
+    });
+  });
+}
 
 

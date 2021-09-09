@@ -56,16 +56,16 @@
       <nav class="menu__body">
         <ul class="menu__list">
           <li>
-            <a data-text="Expertise" href="./expertise.html" class="menu__link"><span>Expertise</span></a>
+            <a data-text="Expertise" data-color="white" href="./expertise.html" class="menu__link"><span>Expertise</span></a>
           </li>
           <li>
-            <a data-text="About" href="./about.html" class="menu__link">About</a>
+            <a data-text="About" data-color="white" href="./about.html" class="menu__link">About</a>
           </li>
           <li>
-            <a data-text="Careers" href="./careers.html" class="menu__link">Careers</a>
+            <a data-text="Careers" data-color="white" href="./careers.html" class="menu__link">Careers</a>
           </li>
           <li>
-            <a data-text="Contact" href="./contact.html" class="menu__link">Contact</a>
+            <a data-text="Contact" data-color="white" href="./contact.html" class="menu__link">Contact</a>
           </li>
         </ul>
       </nav>
@@ -78,10 +78,29 @@
     <section class="careers-page__section careers-page__section_intro intro">
       <div class="intro__body">
         <h1 class="intro__title main-title">Careers</h1>
+        <h3 class="expertise__subtitle title">
+          Our key value is people!
+        </h3>
         <div class="intro__text text">
-          The only way to win on modern markets is constant enhancement.<br />
-          And the only way to keep sustainable enhancement is coherent
-          collaboration of highly talented people.
+          We believe that success can be achieved by professionals, but a triumph can be only achieved by a team. Thus, we invest in handling any kind of unfriendly behavior.
+        </div>
+        <div class="intro__text text">
+          We value soft skills as much as hard skills. Any team member is always supported in any kind of approach and thinking.
+        </div>
+        <div class="intro__text text">
+          To maintain the team spirit, we handle various kinds of team buildings.
+        </div>
+        <div class="intro__text text">
+          We value open-minded, initiative and self-motivated people who are focused on achieving great results.
+        </div>
+        <div class="intro__text text">
+          The structure of the company is flat, the team members are great at quick decision making and fast feedbacks.
+        </div>
+        <div class="intro__text text">
+          The involvement and contribution of each person is natural. We support any kind of development – professional and personal. We value initiative and creativity. We are ready to support new ideas.
+        </div>
+        <div class="intro__text text">
+          We care about work - life balance and psychological people’s conditions. We support and invest in sport and different hobby activities. We have cozy 24/7 offices as well as we provide the ability to work remotely from home or from anywhere place desired.
         </div>
       </div>
       <div class="intro__bg bg-intro">
@@ -171,7 +190,7 @@
             <div class="hr-manager__column hr-manager__column_info">
               <div class="hr-manager__info">
                 <div class="hr-manager__text">
-                  Haven't found a current vacancy? Tell our HR manager Valeria about your experience
+                  Haven't found a current vacancy? Tell our HR manager Valerie about your experience
                 </div>
                 <a href="mailto:job@bhft.com" class="hr-manager__mail gragient-text">
                   job@bhft.com
@@ -228,6 +247,12 @@
                             <path d="M1 16.5V21.5H23V16.5" stroke="white" stroke-miterlimit="10" />
                           </svg>
                         </div>
+                        <div class="file__unpin">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4L20 20" stroke="black" stroke-miterlimit="10" />
+                            <path d="M4 20L20 4" stroke="black" stroke-miterlimit="10" />
+                          </svg>
+                        </div>
                         <div class="file__paperclip">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M23.2635 7.73654L10.8891 20.1109C8.7412 22.2588 5.2588 22.2588 3.11091 20.1109V20.1109C0.963029 17.963 0.963029 14.4806 3.11091 12.3327L11.7093 3.73432C13.0762 2.36749 15.2922 2.36749 16.6591 3.73432V3.73432C18.0259 5.10116 18.0259 7.31723 16.6591 8.68407L8.57607 16.7671C7.93995 17.4032 6.90858 17.4032 6.27245 16.7671V16.7671C5.63633 16.1309 5.63633 15.0996 6.27245 14.4635L12.8429 7.89304" stroke="black" />
@@ -239,7 +264,8 @@
                           </svg>
                         </div>
                       </div>
-                      <span class="file__text">Upload file</span>
+                      <span class="file__text"><span class="file__name">Upload file</span></span>
+                      <span class="file__ext"></span>
                     </div>
                   </div>
                   <span class="form__maxsize">(5mb max)</span>
@@ -264,7 +290,8 @@
 
               <div class="form__btn">
                 <div class="btn-wrapper">
-                  <a href="./about.html" class="btn btn_gradient"><span>about</spa></a>
+                  <!-- In case of submiting form data to the server just add one more class 'btn_loading' to btn. On success add 'btn_success'-->
+                  <button class="btn btn_gradient"><span>Submit request</span></button>
                 </div>
               </div>
 
@@ -280,15 +307,15 @@
       <div class="footer__top top-footer">
         <div class="top-footer__body">
           <ul class="top-footer__pages-list">
-            <li><a href="#" class="top-footer__page-link">Expertise</a></li>
-            <li><a href="#" class="top-footer__page-link">About</a></li>
-            <li><a href="#" class="top-footer__page-link">Careers</a></li>
-            <li><a href="#" class="top-footer__page-link">Contact</a></li>
+            <li><a href="./expertise.html" class="top-footer__page-link">Expertise</a></li>
+            <li><a href="./about.html" class="top-footer__page-link">About</a></li>
+            <li><a href="./careers.html" class="top-footer__page-link">Careers</a></li>
+            <li><a href="./contact.html" class="top-footer__page-link">Contact</a></li>
           </ul>
           <div class="top-footer__social social-footer">
             <div class="social-footer__body">
               <div class="social-footer__list footer-social">
-                <a href="#" class="footer-social__link">
+                <a href="https://linkedin.com/" class="footer-social__link">
                   <img src="./img/icons/Linkedin.svg" alt="linkedin" />
                 </a>
               </div>
